@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Elite League — Transfer Window</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div style="width:44px;height:44px;border-radius:8px;border:2px solid var(--neon);box-shadow:0 0 12px rgba(0,255,136,0.4);background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚽</div>
+    <div class="sidebar-logo-text">ELITE LEAGUE<span>UNIVERSITY FC</span></div>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="index.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Home
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="live.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9l5 3-5 3V9z"/></svg>
+        Live <span class="nav-badge live">LIVE</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Competition</div>
+      <a href="fixtures.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Fixtures
+      </a>
+      <a href="games.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Games
+      </a>
+      <a href="standings.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Standings
+      </a>
+      <a href="transfer.html" class="nav-item active">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+        Transfers
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Players & Teams</div>
+      <a href="team.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Teams
+      </a>
+      <a href="goals.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        Goals
+      </a>
+      <a href="assists.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Assists
+      </a>
+      <a href="database.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 4 3h8c2.5 0 4-1 4-3V7c0-2-1.5-3-4-3H8C5.5 4 4 5 4 7zm0 5h16"/></svg>
+        Database
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Media</div>
+      <a href="news.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+        News
+      </a>
+      <a href="admin.html" class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+        Admin
+      </a>
+    </div>
+  </nav>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <span class="topbar-title">ELITE LEAGUE — MID-SEASON TRANSFERS</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--muted);" id="live-clock"></span>
+      <a href="live.html" class="btn btn-neon" style="padding:8px 14px;font-size:12px;">
+        <span class="live-dot"></span> LIVE
+      </a>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+ <!-- SYSTEM ROOT CONTROLLER WRAPPER -->
+<div id="market-dashboard-page-wrapper">
+
+    <!-- WINDOW TIMELINE STATUS -->
+    <div style="background: linear-gradient(135deg, #040D20, #0A1C3A); border: 1px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0,102,255,0.1); border: 1px solid rgba(0,102,255,0.3); border-radius: 20px; padding: 4px 14px; margin-bottom: 12px;">
+          <span style="font-size: 11px; color: var(--blue); font-weight: 700; letter-spacing: 1px;">MARKET STATUS</span>
+        </div>
+        <h2 id="market-window-title" style="font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 800; color: var(--white); margin-bottom: 4px;">WINDOW OPEN</h2>
+        <p id="market-window-description" style="color: var(--muted); font-size: 14px; max-width: 480px;">Real-time roster changes, squad drops, and player movements are now active.</p>
+      </div>
+      <div style="background: var(--navy3); border: 1px solid var(--border); padding: 16px 24px; border-radius: 12px; text-align: center; min-width: 200px;">
+        <div id="countdown-label" style="font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 1px; margin-bottom: 4px;">WINDOW CLOSES IN</div>
+        <div id="window-countdown" style="font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 700; color: var(--neon);">14d : 08h : 45m</div>
+      </div>
+    </div>
+  
+    <!-- MAIN GRID SECTION -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;" class="w-full max-[991px]:grid-cols-1">
+      
+      <!-- COLUMN 1: LIVE TRANSFER RELEASES -->
+      <div class="card" style="padding: 0; overflow: hidden;" id="market-actions-card">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
+          <div class="section-title">RECENT MARKET ACTIONS</div>
+          <div class="section-sub">Real-time registrations and squad drop operations</div>
+        </div>
+        <div style="display: flex; flex-direction: column;" id="market-actions-container">
+          <!-- Populated by Firebase -->
+        </div>
+      </div>
+  
+      <!-- COLUMN 2: COMBINED ROSTER POLICY INSIGHT -->
+      <div class="card neon" id="roster-policy-card">
+        <div class="section-header" style="margin-bottom: 14px;">
+          <div>
+            <div class="section-title" style="color: var(--gold);">EDU-ARTS COMBINED CLAUSE</div>
+            <div class="section-sub">League Roster Allocation System</div>
+          </div>
+        </div>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 16px;">
+          To ensure widespread involvement across the university community, coaches are limited strictly to <strong style="color:var(--white);">13 carded positions</strong> per grade team level.
+        </p>
+        <div style="background: var(--navy3); padding: 16px; border-radius: 10px; border-left: 3px solid var(--gold); margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--white); margin-bottom: 4px;">Unallocated Pools</div>
+          <div style="font-size: 13px; color: var(--muted);">Students not registering under primary level cards are instantly processed into safe-haven designations under the EDU-ARTS multi-tier group.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 14px;">
+          <span>Active Waiver Placements: <strong id="waiver-pool-count" style="color: var(--white);">0 Players</strong></span>
+          <a href="database.html" style="color: var(--neon); text-decoration: none; font-weight: 600;">Browse Free Agents →</a>
+        </div>
+      </div>
+  
+    </div>
+  
+  </div>
+
+  </main>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Home
+  </a>
+  <a href="live.html" class="mobile-nav-item">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9l5 3-5 3V9z"/></svg>
+    Live
+  </a>
+  <a href="standings.html" class="mobile-nav-item">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    Tables
+  </a>
+  <a href="team.html" class="mobile-nav-item">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    Teams
+  </a>
+  <a href="news.html" class="mobile-nav-item">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+    News
+  </a>
+</nav>
+
+<script>
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCR_L7OutBlVEmEl57Z7xrpC3rKdCnte3M",
+  authDomain: "elite-league-2.firebaseapp.com",
+  databaseURL: "https://elite-league-2-default-rtdb.firebaseio.com",
+  projectId: "elite-league-2",
+  storageBucket: "elite-league-2.firebasestorage.app",
+  messagingSenderId: "327742283927",
+  appId: "1:327742283927:web:ad3247aa41aaad5a6609d2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const transfersRef = firebase.database().ref('transfers');
+
+// Real-time Listener
+transfersRef.on('value', (snapshot) => {
+  const data = snapshot.val() || {};
+  renderRecentTransfers(data);
+});
+
+function renderRecentTransfers(transfers) {
+  const container = document.getElementById('market-actions-container');
+  container.innerHTML = '';
+
+  const transfersArray = Object.values(transfers).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  if (transfersArray.length === 0) {
+    container.innerHTML = `
+      <div id="market-actions-empty" style="padding: 60px 24px; text-align: center; color: var(--muted);">
+        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+        <div style="font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px;">No System Actions Registered</div>
+        <div style="font-size: 12px; max-width: 320px; margin: 0 auto;">Approved roster transfers and squad movements will appear here in real-time.</div>
+      </div>
+    `;
+    return;
+  }
+
+  transfersArray.forEach(transfer => {
+    const div = document.createElement('div');
+    div.style.cssText = "padding:16px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px;";
+    div.innerHTML = `
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:18px;">🔄</div>
+      <div style="flex:1;">
+        <div style="font-weight:600;color:var(--white);">${transfer.player || 'Player'} → ${transfer.newTeam || 'New Team'}</div>
+        <div style="font-size:12px;color:var(--muted);">${transfer.type || 'Transfer'} • ${transfer.timestamp ? new Date(transfer.timestamp).toLocaleTimeString() : 'Just now'}</div>
+      </div>
+      <div style="color:var(--neon);font-size:11px;font-weight:700;">APPROVED</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Notification Permission
+if ("Notification" in window) {
+  Notification.requestPermission();
+}
+
+window.onload = () => {
+  console.log("%c✅ Transfer Window connected to Firebase Realtime Database", "color:#00FF88");
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Goals — Elite League</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:8px;border:2px solid var(--neon);box-shadow:0 0 12px rgba(0,255,136,0.4);background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚽</div>
+      <div class="sidebar-logo-text">ELITE LEAGUE<span>UNIVERSITY FC</span></div>
+    </div>
+    <nav>
+      <div class="nav-section">
+        <div class="nav-label">Main</div>
+        <a href="index.html" class="nav-item active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Home
+        </a>
+        <a href="dashboard.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Dashboard
+        </a>
+        <a href="live.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9l5 3-5 3V9z"/></svg>
+          Live <span class="nav-badge live">LIVE</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Competition</div>
+        <a href="fixtures.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Fixtures
+        </a>
+        <a href="games.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Games
+        </a>
+        <a href="standings.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Standings
+        </a>
+        <a href="transfer.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          Transfers
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Players & Teams</div>
+        <a href="team.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Teams
+        </a>
+        <a href="goals.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Goals
+        </a>
+        <a href="assists.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Assists
+        </a>
+        <a href="database.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 4 3h8c2.5 0 4-1 4-3V7c0-2-1.5-3-4-3H8C5.5 4 4 5 4 7zm0 5h16"/></svg>
+          Database
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Media</div>
+        <a href="news.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          News
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+          Admin
+        </a>
+      </div>
+    </nav>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <span class="topbar-title">GOALS & TOP SCORERS</span>
+    </div>
+    <div class="topbar-right"><span style="font-size:12px;color:var(--muted);" id="live-clock"></span></div>
+  </header>
+  <main class="page-content">
+
+  <!-- SYSTEM ROOT CONTROLLER WRAPPER -->
+<div id="top-scorers-dashboard-wrapper">
+
+    <!-- TOP-LEVEL SUMMARY METRIC CARDS -->
+    <div class="stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:16px; margin-bottom:24px;">
+      <div class="stat-card" style="padding:16px; border-radius:12px; background:var(--navy2); border:1px solid var(--border);">
+        <div class="icon gold" style="font-size:20px; margin-bottom:6px;">⚽</div>
+        <div class="stat-value" id="stat-total-goals" style="font-family:'Orbitron',sans-serif; font-size:24px; font-weight:800; color:var(--white);">0</div>
+        <div class="stat-label" style="font-size:11px; color:var(--muted); margin-top:2px;">Total Goals S3</div>
+      </div>
+      <div class="stat-card" style="padding:16px; border-radius:12px; background:var(--navy2); border:1px solid var(--border);">
+        <div class="icon neon" style="font-size:20px; margin-bottom:6px;">🥇</div>
+        <div class="stat-value" id="stat-top-scorer-goals" style="font-family:'Orbitron',sans-serif; font-size:24px; font-weight:800; color:var(--white);">0</div>
+        <div class="stat-label" style="font-size:11px; color:var(--muted); margin-top:2px;">Top Scorer Goals</div>
+      </div>
+      <div class="stat-card" style="padding:16px; border-radius:12px; background:var(--navy2); border:1px solid var(--border);">
+        <div class="icon blue" style="font-size:20px; margin-bottom:6px;">📊</div>
+        <div class="stat-value" id="stat-avg-goals" style="font-family:'Orbitron',sans-serif; font-size:24px; font-weight:800; color:var(--white);">0.0</div>
+        <div class="stat-label" style="font-size:11px; color:var(--muted); margin-top:2px;">Avg Goals/Game</div>
+      </div>
+      <div class="stat-card" style="padding:16px; border-radius:12px; background:var(--navy2); border:1px solid var(--border);">
+        <div class="icon red" style="font-size:20px; margin-bottom:6px;">🎯</div>
+        <div class="stat-value" id="stat-games-played" style="font-family:'Orbitron',sans-serif; font-size:24px; font-weight:800; color:var(--white);">0</div>
+        <div class="stat-label" style="font-size:11px; color:var(--muted); margin-top:2px;">Games Played</div>
+      </div>
+    </div>
+  
+    <!-- GOLDEN BOOT LEADER -->
+    <div id="golden-boot-leader-container" style="background:linear-gradient(135deg, rgba(255,215,0,0.02), rgba(16,24,48,0.95)); border:1px solid rgba(255,215,0,0.15); border-radius:16px; padding:24px; margin-bottom:24px; position:relative; overflow:hidden;">
+      <div style="position:relative; display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+        <div style="width:80px; height:80px; border-radius:50%; background:var(--navy3); border:3px dashed var(--border); display:flex; align-items:center; justify-content:center; font-size:32px;" id="boot-leader-icon">👑</div>
+        <div style="flex:1;">
+          <div style="font-size:10px; color:var(--gold); letter-spacing:2px; font-weight:700;">🥇 GOLDEN BOOT LEADER</div>
+          <div id="boot-leader-name" style="font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; color:var(--white);">Awaiting Kick-off</div>
+          <div id="boot-leader-meta" style="font-size:13px; color:var(--muted);">Season 3 Tournament</div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- FILTER TABS -->
+    <div class="tabs" id="scorers-filter-tabs" style="margin-bottom:20px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="tab active" data-tab="all">All Groups</button>
+      <button class="tab" data-tab="facit">FACIT</button>
+      <button class="tab" data-tab="law">LAW</button>
+      <button class="tab" data-tab="nases">NASES</button>
+      <button class="tab" data-tab="mss">MSS</button>
+      <button class="tab" data-tab="edu">EDU-ARTS</button>
+    </div>
+  
+    <!-- PANEL: ALL GROUPS COMBINED -->
+    <div data-panel="all" id="panel-scorers-all">
+      <div class="card" style="padding:20px; background:var(--navy2); border-radius:12px; border:1px solid var(--border);">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:16px;">
+          <div>
+            <div class="section-title" style="font-family:'Orbitron',sans-serif; font-size:16px; font-weight:800; color:var(--white);">TOP SCORERS — SEASON 3</div>
+            <div class="section-sub" style="font-size:12px; color:var(--muted);">All Groups Combined</div>
+          </div>
+          <div class="search-bar" style="max-width:200px; display:flex; align-items:center; gap:8px; background:var(--navy3); border:1px solid var(--border); padding:6px 12px; border-radius:6px;">
+            <svg width="14" height="14" fill="none" stroke="var(--muted)" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search player…" id="tableSearch" style="background:transparent; border:none; color:var(--white); font-size:13px; outline:none; width:100%;"/>
+          </div>
+        </div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;" id="table-master-scorers">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); font-size:12px; color:var(--muted);">
+                <th style="padding:12px 8px;">Rank</th>
+                <th style="padding:12px 8px;">Player</th>
+                <th style="padding:12px 8px;">Team</th>
+                <th style="padding:12px 8px;">Group</th>
+                <th style="padding:12px 8px;">Pos</th>
+                <th style="padding:12px 8px;">Goals</th>
+                <th style="padding:12px 8px;">Apps</th>
+                <th style="padding:12px 8px;">Avg</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scorers-all"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <!-- GROUP SPECIFIC PANELS (FACIT, LAW, etc.) -->
+    <div data-panel="facit" id="panel-scorers-facit" style="display:none;">
+      <div class="card" style="padding:20px; background:var(--navy2); border-radius:12px; border:1px solid var(--border);">
+        <div class="section-title" style="font-family:'Orbitron',sans-serif; font-size:15px; font-weight:800; color:var(--white); margin-bottom:16px;">FACIT GROUP — TOP SCORERS</div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); font-size:12px; color:var(--muted);">
+                <th style="padding:12px 8px;">Rank</th><th style="padding:12px 8px;">Player</th><th style="padding:12px 8px;">Team</th><th style="padding:12px 8px;">Goals</th><th style="padding:12px 8px;">Apps</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scorers-facit"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <div data-panel="law" id="panel-scorers-law" style="display:none;">
+      <div class="card" style="padding:20px; background:var(--navy2); border-radius:12px; border:1px solid var(--border);">
+        <div class="section-title" style="font-family:'Orbitron',sans-serif; font-size:15px; font-weight:800; color:var(--white); margin-bottom:16px;">LAW GROUP — TOP SCORERS</div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); font-size:12px; color:var(--muted);">
+                <th style="padding:12px 8px;">Rank</th><th style="padding:12px 8px;">Player</th><th style="padding:12px 8px;">Team</th><th style="padding:12px 8px;">Goals</th><th style="padding:12px 8px;">Apps</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scorers-law"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <div data-panel="nases" id="panel-scorers-nases" style="display:none;">
+      <div class="card" style="padding:20px; background:var(--navy2); border-radius:12px; border:1px solid var(--border);">
+        <div class="section-title" style="font-family:'Orbitron',sans-serif; font-size:15px; font-weight:800; color:var(--white); margin-bottom:16px;">NASES GROUP — TOP SCORERS</div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); font-size:12px; color:var(--muted);">
+                <th style="padding:12px 8px;">Rank</th><th style="padding:12px 8px;">Player</th><th style="padding:12px 8px;">Team</th><th style="padding:12px 8px;">Goals</th><th style="padding:12px 8px;">Apps</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scorers-nases"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <div data-panel="mss" id="panel-scorers-mss" style="display:none;">
+      <div class="card" style="padding:20px; background:var(--navy2); border-radius:12px; border:1px solid var(--border);">
+        <div class="section-title" style="font-family:'Orbitron',sans-serif; font-size:15px; font-weight:800; color:var(--white); margin-bottom:16px;">MSS GROUP — TOP SCORERS</div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); font-size:12px; color:var(--muted);">
+                <th style="padding:12px 8px;">Rank</th><th style="padding:12px 8px;">Player</th><th style="padding:12px 8px;">Team</th><th style="padding:12px 8px;">Goals</th><th style="padding:12px 8px;">Apps</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scorers-mss"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <div data-panel="edu" id="panel-scorers-edu" style="display:none;">
+      <div class="card" style="padding:20px; background:var(--navy2); border-radius:12px; border:1px solid var(--border);">
+        <div class="section-title" style="font-family:'Orbitron',sans-serif; font-size:15px; font-weight:800; color:var(--white); margin-bottom:16px;">EDU-ARTS GROUP — TOP SCORERS</div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); font-size:12px; color:var(--muted);">
+                <th style="padding:12px 8px;">Rank</th><th style="padding:12px 8px;">Player</th><th style="padding:12px 8px;">Team</th><th style="padding:12px 8px;">Goals</th><th style="padding:12px 8px;">Apps</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scorers-edu"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+  </div>
+  </main>
+</div>
+
+<script>
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCR_L7OutBlVEmEl57Z7xrpC3rKdCnte3M",
+  authDomain: "elite-league-2.firebaseapp.com",
+  databaseURL: "https://elite-league-2-default-rtdb.firebaseio.com",
+  projectId: "elite-league-2",
+  storageBucket: "elite-league-2.firebasestorage.app",
+  messagingSenderId: "327742283927",
+  appId: "1:327742283927:web:ad3247aa41aaad5a6609d2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const goalsRef = firebase.database().ref('goals');
+
+// Real-time Listener
+goalsRef.on('value', (snapshot) => {
+  const data = snapshot.val() || {};
+  renderAllScorers(data);
+});
+
+function renderAllScorers(players) {
+  const allBody = document.getElementById('tbody-scorers-all');
+  allBody.innerHTML = '';
+
+  const playersArray = Object.values(players).sort((a, b) => (b.goals || 0) - (a.goals || 0));
+
+  // Update stats
+  let totalGoals = 0;
+  playersArray.forEach(p => totalGoals += (p.goals || 0));
+  document.getElementById('stat-total-goals').textContent = totalGoals;
+
+  if (playersArray.length === 0) {
+    allBody.innerHTML = `<tr><td colspan="8" style="padding:32px;text-align:center;color:var(--muted);">No goals recorded yet</td></tr>`;
+    return;
+  }
+
+  playersArray.forEach((player, index) => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border)';
+    tr.innerHTML = `
+      <td style="padding:12px 8px;">${index + 1}</td>
+      <td style="padding:12px 8px;">${player.name || 'Unknown'}</td>
+      <td style="padding:12px 8px;">${player.team || 'N/A'}</td>
+      <td style="padding:12px 8px;">${player.group || 'N/A'}</td>
+      <td style="padding:12px 8px;">${player.position || 'N/A'}</td>
+      <td style="padding:12px 8px; text-align:center; font-weight:800; color:#00FF88;">${player.goals || 0}</td>
+      <td style="padding:12px 8px; text-align:center;">${player.apps || 0}</td>
+      <td style="padding:12px 8px; text-align:center;">${player.avg || '0.0'}</td>
+    `;
+    allBody.appendChild(tr);
+  });
+}
+
+// Tab functionality
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    document.querySelectorAll('[data-panel]').forEach(panel => {
+      panel.style.display = panel.getAttribute('data-panel') === tab.getAttribute('data-tab') ? 'block' : 'none';
+    });
+  });
+});
+
+// Notification permission
+if ("Notification" in window) Notification.requestPermission();
+
+window.onload = () => {
+  console.log("%c✅ Goals page connected to Firebase Realtime Database", "color:#00FF88");
+};
+</script>
+</body>
+</html>

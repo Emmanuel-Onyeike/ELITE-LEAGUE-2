@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard — Elite League</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:8px;border:2px solid var(--neon);box-shadow:0 0 12px rgba(0,255,136,0.4);background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚽</div>
+      <div class="sidebar-logo-text">ELITE LEAGUE<span>UNIVERSITY FC</span></div>
+    </div>
+    <nav>
+      <div class="nav-section">
+        <div class="nav-label">Main</div>
+        <a href="index.html" class="nav-item active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Home
+        </a>
+        <a href="dashboard.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Dashboard
+        </a>
+        <a href="live.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9l5 3-5 3V9z"/></svg>
+          Live <span class="nav-badge live">LIVE</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Competition</div>
+        <a href="fixtures.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Fixtures
+        </a>
+        <a href="games.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Games
+        </a>
+        <a href="standings.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Standings
+        </a>
+        <a href="transfer.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          Transfers
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Players & Teams</div>
+        <a href="team.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Teams
+        </a>
+        <a href="goals.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Goals
+        </a>
+        <a href="assists.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Assists
+        </a>
+        <a href="database.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 4 3h8c2.5 0 4-1 4-3V7c0-2-1.5-3-4-3H8C5.5 4 4 5 4 7zm0 5h16"/></svg>
+          Database
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Media</div>
+        <a href="news.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          News
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+          Admin
+        </a>
+      </div>
+    </nav>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <span class="topbar-title">DASHBOARD</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--muted);" id="live-clock"></span>
+      <a href="live.html" class="btn btn-neon" style="padding:8px 14px;font-size:12px;"><span class="live-dot"></span> LIVE</a>
+    </div>
+  </header>
+  <main class="page-content">
+
+    <!-- STATS ROW -->
+    <div class="stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;">
+      <div class="stat-card" style="background: linear-gradient(135deg, #090f1d 0%, #050a14 100%); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div class="stat-label" style="color: #94A3B8; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Active Groups</div>
+          <div class="icon blue" style="font-size: 20px; width: 36px; height: 36px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🏟️</div>
+        </div>
+        <div id="ov-groups" class="stat-value" style="font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #FFFFFF; line-height: 1; margin-bottom: 10px;">5</div>
+      </div>
+  
+      <div class="stat-card" style="background: linear-gradient(135deg, #090f1d 0%, #050a14 100%); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div class="stat-label" style="color: #94A3B8; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Goals Scored</div>
+          <div class="icon neon" style="font-size: 20px; width: 36px; height: 36px; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">⚽</div>
+        </div>
+        <div id="ov-goals" class="stat-value" style="font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #00FF88; line-height: 1; margin-bottom: 10px;">0</div>
+      </div>
+  
+      <div class="stat-card" style="background: linear-gradient(135deg, #090f1d 0%, #050a14 100%); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div class="stat-label" style="color: #94A3B8; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Players Registered</div>
+          <div class="icon gold" style="font-size: 20px; width: 36px; height: 36px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">👥</div>
+        </div>
+        <div id="ov-players" class="stat-value" style="font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #FFFFFF; line-height: 1; margin-bottom: 10px;">294</div>
+      </div>
+  
+      <div class="stat-card" style="background: linear-gradient(135deg, #1e1114 0%, #050a14 100%); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div class="stat-label" style="color: #EF4444; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Live Matches</div>
+          <div class="icon red" style="font-size: 16px; width: 36px; height: 36px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite;">🔴</div>
+        </div>
+        <div id="ov-live" class="stat-value" style="font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #EF4444; line-height: 1; margin-bottom: 10px;">0</div>
+      </div>
+    </div>
+
+    <!-- LIVE MATCH -->
+    <div class="card" style="background: linear-gradient(135deg, #090f1d 0%, #050a14 100%); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 24px; margin-bottom: 20px;">
+      <div class="section-title" style="margin-bottom:16px;">🔴 LIVE MATCH</div>
+      <div id="live-match-display" class="text-center py-8">
+        <div id="live-score" class="text-6xl font-bold mb-4">0 - 0</div>
+        <div id="live-teams" class="text-xl text-gray-400">CSC 400 vs LAW 400</div>
+      </div>
+    </div>
+
+    <!-- GROUP STANDINGS -->
+    <div class="card" style="background: linear-gradient(135deg, #090f1d 0%, #050a14 100%); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 24px; margin-bottom: 20px;">
+      <div class="section-title">Group Standings Summary</div>
+      <div id="group-standings-summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px;">
+        <!-- Populated by Firebase -->
+      </div>
+    </div>
+
+    <!-- UPCOMING FIXTURES -->
+    <div class="card" style="background: linear-gradient(135deg, #090f1d 0%, #050a14 100%); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 24px;">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+        <div>
+          <div class="section-title" style="font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 900; color: #FFFFFF;">Upcoming Fixtures</div>
+        </div>
+      </div>
+      <div id="upcoming-fixtures-list" style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Populated by Firebase -->
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCR_L7OutBlVEmEl57Z7xrpC3rKdCnte3M",
+  authDomain: "elite-league-2.firebaseapp.com",
+  databaseURL: "https://elite-league-2-default-rtdb.firebaseio.com",
+  projectId: "elite-league-2",
+  storageBucket: "elite-league-2.firebasestorage.app",
+  messagingSenderId: "327742283927",
+  appId: "1:327742283927:web:ad3247aa41aaad5a6609d2"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Real-time References
+const liveRef = firebase.database().ref('liveMatch');
+const standingsRef = firebase.database().ref('standings');
+
+// Live Match Listener
+liveRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    document.getElementById('live-score').textContent = `${data.homeScore || 0} - ${data.awayScore || 0}`;
+    document.getElementById('live-teams').textContent = `${data.home || 'CSC 400'} vs ${data.away || 'LAW 400'}`;
+  }
+});
+
+// Standings Listener
+standingsRef.on('value', (snapshot) => {
+  // Update standings grid (example)
+  console.log("Standings updated");
+});
+
+// Request Notification Permission
+if ("Notification" in window) {
+  Notification.requestPermission();
+}
+
+window.onload = () => {
+  console.log("%c✅ Dashboard connected to Firebase", "color:#00FF88");
+};
+</script>
+</body>
+</html>

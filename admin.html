@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Elite League — MASTER ADMIN CONTROL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<style>
+  :root {
+    --navy: #0B0E14;
+    --navy2: #141923;
+    --navy3: #1D2432;
+    --border: #2D3748;
+    --neon: #00FF88;
+    --blue: #0077FF;
+    --muted: #A0AEC0;
+    --white: #FFFFFF;
+  }
+  body { background-color: var(--navy); color: var(--white); font-family: system-ui, sans-serif; }
+  .admin-card { background: var(--navy2); border: 1px solid var(--border); border-radius: 16px; }
+  .form-input { background: var(--navy3); border: 1px solid var(--border); color: var(--white); border-radius: 8px; padding: 12px; width: 100%; }
+  .form-input:focus { outline: none; border-color: var(--neon); }
+  .tab-btn { padding: 14px 24px; border-bottom: 4px solid transparent; color: var(--muted); font-weight: 600; transition: all 0.2s; }
+  .tab-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(0,255,136,0.1); }
+  .notification { animation: slideIn 0.4s ease forwards; }
+  @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .live-dot { animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body class="overflow-hidden">
+
+<!-- PIN MODAL -->
+<div id="pinModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md">
+  <div class="bg-[#141923] border border-gray-700 rounded-3xl p-10 w-full max-w-md text-center">
+    <div class="text-6xl mb-6">🔐</div>
+    <h2 class="text-3xl font-bold mb-2">MASTER ADMIN</h2>
+    <p class="text-gray-400 mb-8">Enter 6-digit PIN</p>
+    <form id="pinForm" onsubmit="verifyPin(event)">
+      <input type="password" id="adminPin" maxlength="6" placeholder="••••••" class="block w-full text-center text-5xl tracking-widest bg-[#1D2432] border border-gray-600 rounded-2xl py-8 focus:border-[#00FF88]">
+      <div id="pinError" class="text-red-500 mt-4 hidden">Invalid PIN</div>
+      <div class="grid grid-cols-2 gap-4 mt-10">
+        <button type="button" onclick="window.location.reload()" class="py-4 border border-gray-600 rounded-2xl">Cancel</button>
+        <button type="submit" class="py-4 bg-[#00FF88] text-black font-bold rounded-3xl">UNLOCK CONSOLE</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN ADMIN -->
+<div id="mainAdmin" class="hidden h-screen flex flex-col">
+
+  <header class="h-16 bg-[#141923] border-b border-gray-700 flex items-center px-8 justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 bg-[#1D2432] border-2 border-[#00FF88] rounded-2xl flex items-center justify-center text-3xl">⚽</div>
+      <div>
+        <div class="font-bold text-xl tracking-wider">ELITE LEAGUE</div>
+        <div class="text-xs text-[#00FF88]">MASTER CONTROL CENTER</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div onclick="showNotifPanel()" class="relative cursor-pointer text-3xl">
+        🛎️ <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
+      </div>
+      <button onclick="globalSaveAll()" class="flex items-center gap-3 bg-[#00FF88] hover:bg-emerald-400 text-black font-bold px-8 py-3 rounded-3xl transition">
+        💾 SAVE &amp; BROADCAST TO ALL
+      </button>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- SIDEBAR -->
+    <div class="w-72 bg-[#141923] border-r border-gray-700 flex flex-col overflow-y-auto">
+      <nav class="flex-1 p-6 space-y-2">
+        <button onclick="switchTab(0)" class="tab-btn w-full text-left active flex items-center gap-3 px-5 py-4 rounded-2xl">📊 Overview</button>
+        <button onclick="switchTab(1)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">🏃 Roster</button>
+        <button onclick="switchTab(2)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">📅 Fixtures</button>
+        <button onclick="switchTab(3)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">🔴 Live Engine</button>
+        <button onclick="switchTab(4)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">🔄 Transfers</button>
+        <button onclick="switchTab(5)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">📰 Newsroom</button>
+        <button onclick="switchTab(6)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">📋 Standings</button>
+        <button onclick="switchTab(7)" class="tab-btn w-full text-left flex items-center gap-3 px-5 py-4 rounded-2xl">📊 Database</button>
+      </nav>
+      <div class="p-6 border-t border-gray-700">
+        <div class="flex items-center gap-3 text-emerald-400">
+          <div class="w-3 h-3 bg-emerald-400 rounded-full live-dot"></div>
+          <span id="onlineUsers">23</span> users online
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="flex-1 overflow-y-auto p-8" id="contentArea">
+
+      <!-- OVERVIEW -->
+      <div id="tab-0" class="tab-content">
+        <h1 class="text-4xl font-bold mb-10">System Overview</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="admin-card p-8"><div class="text-emerald-400">Live Matches</div><div id="ov-live" class="text-6xl font-bold mt-3">0</div></div>
+          <div class="admin-card p-8"><div class="text-[#00FF88]">Total Goals</div><div id="ov-goals" class="text-6xl font-bold mt-3">0</div></div>
+          <div class="admin-card p-8"><div class="text-amber-400">Players</div><div id="ov-players" class="text-6xl font-bold mt-3">0</div></div>
+          <div class="admin-card p-8"><div class="text-blue-400">Fixtures</div><div id="ov-fixtures" class="text-6xl font-bold mt-3">0</div></div>
+        </div>
+      </div>
+
+      <!-- ROSTER -->
+      <div id="tab-1" class="tab-content hidden">
+        <div class="flex justify-between mb-6">
+          <h2 class="text-3xl font-bold">Roster Management</h2>
+          <button onclick="addPlayer()" class="bg-[#00FF88] text-black px-8 py-3 rounded-3xl font-bold">+ Add Player</button>
+        </div>
+        <div class="admin-card p-6 overflow-auto max-h-[70vh]">
+          <table class="w-full" id="rosterTable">
+            <thead><tr class="border-b border-gray-700"><th class="text-left py-4">Name</th><th>Faculty</th><th>Level</th><th>Position</th><th>Image</th><th></th></tr></thead>
+            <tbody id="rosterBody" class="text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FIXTURES -->
+      <div id="tab-2" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6">Fixtures Scheduler</h2>
+        <div class="admin-card p-8 max-w-2xl">
+          <form onsubmit="createFixture(event)" class="grid grid-cols-2 gap-6">
+            <div><label class="block text-xs mb-2">Home Team</label><input id="fHome" class="form-input" placeholder="CSC 400"></div>
+            <div><label class="block text-xs mb-2">Away Team</label><input id="fAway" class="form-input" placeholder="LAW 400"></div>
+            <div><label class="block text-xs mb-2">Date</label><input type="date" id="fDate" class="form-input"></div>
+            <div><label class="block text-xs mb-2">Time</label><input type="time" id="fTime" class="form-input"></div>
+            <div class="col-span-2"><button type="submit" class="w-full py-5 bg-blue-600 rounded-3xl font-bold">PUBLISH FIXTURE</button></div>
+          </form>
+        </div>
+        <div id="fixtureList" class="mt-8 grid grid-cols-1 gap-4"></div>
+      </div>
+
+  <!-- TAB 3: SOFASCORE LIVE MATCH ENGINE MODIFIERS -->
+<div id="tab-3" class="tab-content hidden">
+    <div class="admin-card p-8 max-w-4xl mx-auto" id="live-engine-master-card">
+      
+      <!-- Header Block -->
+      <h2 class="text-3xl font-bold mb-6 text-white border-b border-gray-800 pb-3 flex justify-between items-center" id="live-engine-main-title">
+        <span>🔴 Live Match Engine</span>
+        <span class="text-xs text-red-500 animate-pulse bg-red-500/10 px-2.5 py-1 rounded border border-red-500/20 font-bold uppercase tracking-wider">Telemetry Core Online</span>
+      </h2>
+  
+      <!-- CENTRAL FIXTURE TARGET SELECTOR -->
+      <div class="mb-8 p-4 bg-[#1D2432] rounded-xl border border-gray-700" id="live-engine-fixture-picker">
+        <label class="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Target Active Fixture</label>
+        <select id="select-live-engine-active-fixture" class="form-input w-full text-sm">
+            <option value="" disabled selected>-- Select Scheduled Match to Push to Live Feed --</option>
+            
+            <!-- Computer Science Department (CSC) Matrix -->
+            <option value="csc400-vs-csc300">CSC 400 vs CSC 300</option>
+            <option value="csc200-vs-csc100">CSC 200 vs CSC 100</option>
+            
+            <!-- Engineering / Science Associations (NASES) Matrix -->
+            <option value="nases400-vs-nases300">NASES 400 vs NASES 300</option>
+            <option value="nases200-vs-nases100">NASES 200 vs NASES 100</option>
+            
+            <!-- Faculty of Law (LAW) Matrix -->
+            <option value="law500-vs-law300">LAW 500 vs LAW 300</option>
+            <option value="law200-vs-law400">LAW 200 vs LAW 400</option>
+            <option value="law100-vs-law300">LAW 100 vs LAW 300</option>
+            
+            <!-- Management / Medical Science Student Societies (MSS) Matrix -->
+            <option value="mss400-vs-mss300">MSS 400 vs MSS 300</option>
+            <option value="mss200-vs-mss100">MSS 200 vs MSS 100</option>
+            
+            <!-- Faculty of Education / Business Admin Matrix -->
+            <option value="eduarts400-vs-eduarts300">EDU-ARTS 400 vs EDU-ARTS 300</option>
+            <option value="eduarts200-vs-eduarts100">EDU-ARTS 200 vs EDU-ARTS 100</option>
+          </select>
+      </div>
+  
+      <!-- TIMELINE MANAGEMENT CONTROL CONTROLLERS -->
+      <div class="flex flex-wrap gap-4 mb-8" id="live-engine-timeline-controllers">
+        <button onclick="startLiveMatch()" class="flex-1 min-w-[140px] bg-red-600 hover:bg-red-500 text-white px-6 py-4 rounded-3xl font-bold uppercase tracking-wide text-xs transition active:scale-[0.98]">
+          🚀 Start Match
+        </button>
+        <button onclick="halfTime()" class="flex-1 min-w-[140px] bg-amber-600 hover:bg-amber-500 text-white px-6 py-4 rounded-3xl font-bold uppercase tracking-wide text-xs transition active:scale-[0.98]">
+          ⏳ Half Time
+        </button>
+        <!-- ADDED EXTRA PARAMETER: Interrupted / Suspended Status Button Trigger -->
+        <button onclick="interruptMatch()" id="btn-live-match-interrupt" class="flex-1 min-w-[140px] bg-purple-700 hover:bg-purple-600 text-white px-6 py-4 rounded-3xl font-bold uppercase tracking-wide text-xs border border-purple-500/30 transition active:scale-[0.98]">
+          ⚠️ Interrupted
+        </button>
+        <button onclick="stopLiveMatch()" class="flex-1 min-w-[140px] bg-gray-600 hover:bg-gray-500 text-white px-6 py-4 rounded-3xl font-bold uppercase tracking-wide text-xs transition active:scale-[0.98]">
+          🛑 End Match
+        </button>
+      </div>
+  
+      <!-- SOFASCORE REAL-TIME SCOREBOARD INTERFACE DISPLAY LAYER -->
+      <div id="liveBoard" class="hidden space-y-8 animate-fade-in">
+        
+        <!-- Scoreboard Display Grid -->
+        <div class="bg-[#1D2432] rounded-2xl p-8 border border-gray-700 text-center relative overflow-hidden" id="live-scoreboard-display-panel">
+          <div class="flex justify-center items-center gap-8 md:gap-16 text-3xl md:text-5xl font-extrabold text-white mb-4">
+            <div id="liveHomeName" class="tracking-wide">CSC 400</div>
+            <div class="flex items-center gap-6 bg-[#0B0E14] px-6 py-3 rounded-2xl border border-gray-800 shadow-inner">
+              <span id="liveHomeScore" class="text-5xl md:text-6xl text-[#00FF88]">0</span>
+              <span class="text-gray-600 text-3xl">:</span>
+              <span id="liveAwayScore" class="text-5xl md:text-6xl text-[#00FF88]">0</span>
+            </div>
+            <div id="liveAwayName" class="tracking-wide">LAW 400</div>
+          </div>
+          <div class="text-xs font-mono tracking-widest text-gray-400 uppercase" id="live-scoreboard-clock-ticker">Match Runtime Feed Log</div>
+        </div>
+  
+        <!-- INCREMENTAL INSTANT ADJUSTMENT TRIGGERS -->
+        <div class="flex justify-center gap-6" id="live-incremental-goal-triggers">
+          <button onclick="liveGoal('home')" class="flex-1 py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-3xl text-md font-bold uppercase tracking-wider transition active:scale-[0.98] shadow-lg">
+            ⚽ Home Goal (+1)
+          </button>
+          <button onclick="liveGoal('away')" class="flex-1 py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-3xl text-md font-bold uppercase tracking-wider transition active:scale-[0.98] shadow-lg">
+            ⚽ Away Goal (+1)
+          </button>
+        </div>
+  
+        <!-- ANALYTICAL HISTORICAL EVENT DATA INGESTION MATRIX -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="live-goal-registration-matrix">
+          <!-- Home Scorer Log Fieldset -->
+          <div class="p-4 bg-[#141923] border border-gray-800 rounded-xl space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400">Record Home Goal Detail</label>
+            <input id="homeScorer" type="text" class="form-input text-sm" placeholder="Enter Home Player Name">
+            <input id="homeMinute" type="number" class="form-input text-sm" placeholder="Minute Position (e.g. 42)">
+            <button onclick="recordGoal('home')" class="w-full py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition">
+              Log Home Goal File
+            </button>
+          </div>
+  
+          <!-- Away Scorer Log Fieldset -->
+          <div class="p-4 bg-[#141923] border border-gray-800 rounded-xl space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400">Record Away Goal Detail</label>
+            <input id="awayScorer" type="text" class="form-input text-sm" placeholder="Enter Away Player Name">
+            <input id="awayMinute" type="number" class="form-input text-sm" placeholder="Minute Position (e.g. 68)">
+            <button onclick="recordGoal('away')" class="w-full py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition">
+              Log Away Goal File
+            </button>
+          </div>
+        </div>
+  
+        <!-- DISCIPLINARY MATRICES AND CAUTION CONTROL SCHEDULERS -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Disciplinary Action Panel</label>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="live-disciplinary-matrix-buttons">
+            <button onclick="addCard('yellow','home')" class="py-4 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl text-xs uppercase tracking-wider transition active:scale-[0.97]">
+              🟨 Yellow (Home)
+            </button>
+            <button onclick="addCard('red','home')" class="py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-3xl text-xs uppercase tracking-wider transition active:scale-[0.97]">
+              🟥 Red (Home)
+            </button>
+            <button onclick="addCard('yellow','away')" class="py-4 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl text-xs uppercase tracking-wider transition active:scale-[0.97]">
+              🟨 Yellow (Away)
+            </button>
+            <button onclick="addCard('red','away')" class="py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-3xl text-xs uppercase tracking-wider transition active:scale-[0.97]">
+              🟥 Red (Away)
+            </button>
+          </div>
+        </div>
+  
+        <!-- LIVE ANALYTICAL COMMENTARY GENERATION LOG WIRE -->
+        <div class="pt-4 border-t border-gray-800" id="live-commentary-station-container">
+          <label class="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Live Commentary Stream</label>
+          <textarea id="liveComment" class="form-input text-sm" rows="3" placeholder="Add real-time text broadcast commentary..."></textarea>
+          <button onclick="addCommentary()" class="mt-4 w-full py-4 bg-[#00FF88] text-[#0B0E14] font-extrabold rounded-3xl text-sm tracking-wide uppercase hover:bg-emerald-400 transition active:scale-[0.99]">
+            POST COMMENTARY DISPATCH
+          </button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+
+     <!-- TAB 4: ROSTER TRANSFER MARKET PIPELINE LOG HUB -->
+<div id="tab-4" class="tab-content hidden">
+    <div class="admin-card p-8 max-w-2xl mx-auto" id="transfers-logging-card">
+      <h2 class="text-3xl font-bold mb-6 text-white border-b border-gray-800 pb-3 flex justify-between items-center">
+        <span>Transfer Hub</span>
+        <span class="text-xs font-mono text-amber-500 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">Market Window Open</span>
+      </h2>
+      
+      <form onsubmit="event.preventDefault();" class="space-y-5 text-sm" id="form-transfers-logger">
+        <!-- Athlete Name Target Input -->
+        <div>
+          <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-transfer-athlete-target">Target Athlete Full Name</label>
+          <input 
+            id="tPlayer" 
+            type="text" 
+            placeholder="Player Name" 
+            class="form-input" 
+            required 
+          />
+        </div>
+  
+        <!-- Departure and Arrival Matrix -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-transfer-departing">Departing Club (From)</label>
+            <select id="tFrom" class="form-input w-full" required>
+              <option value="" disabled selected>-- Select Source Squad --</option>
+              <option value="CSC 400">CSC 400 (Computer Science)</option>
+              <option value="LAW 100">LAW 100 (Faculty of Law)</option>
+              <option value="LAW 400">LAW 400 (Faculty of Law)</option>
+              <option value="EDU-ARTS">EDU-ARTS (Education & Arts)</option>
+              <option value="BUS-ADMIN">BUS-ADMIN (Business Admin)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-transfer-acquiring">Acquiring Club (To)</label>
+            <select id="tTo" class="form-input w-full" required>
+              <option value="" disabled selected>-- Select Destination Squad --</option>
+              <option value="LAW 400">LAW 400 (Faculty of Law)</option>
+              <option value="CSC 400">CSC 400 (Computer Science)</option>
+              <option value="LAW 100">LAW 100 (Faculty of Law)</option>
+              <option value="EDU-ARTS">EDU-ARTS (Education & Arts)</option>
+              <option value="BUS-ADMIN">BUS-ADMIN (Business Admin)</option>
+            </select>
+          </div>
+        </div>
+  
+        <!-- ADDED EXTRA PARAMETERS: Market Financials & Terms -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-transfer-fee">Transfer Fee Value (Token/Valuation)</label>
+            <input 
+              id="tFee" 
+              type="text" 
+              placeholder="e.g. Undisclosed, Free Agent, or Amount" 
+              class="form-input" 
+            />
+          </div>
+          <div>
+            <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-transfer-duration">Contract Length Term</label>
+            <select id="tDuration" class="form-input w-full">
+              <option value="Current Season">Rest of the Current Season</option>
+              <option value="Full Tier Cycle">Full 1-Year Tournament Cycle</option>
+              <option value="Per-Match Loan">Temporary Per-Match Loan Agreement</option>
+            </select>
+          </div>
+        </div>
+  
+        <!-- ADDED EXTRA PARAMETERS: Department Clearance Upload -->
+        <div>
+          <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-transfer-clearance-doc">Official Clearance Letter / Roster Release File</label>
+          <input 
+            type="file" 
+            id="tClearance" 
+            accept="image/*,application/pdf" 
+            class="form-input text-xs text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer" 
+          />
+        </div>
+  
+        <!-- Dispatch Transaction Button Trigger -->
+        <button 
+          type="button"
+          onclick="executeTransfer()" 
+          class="mt-4 w-full py-5 bg-amber-500 text-black font-extrabold rounded-3xl text-sm tracking-wider uppercase hover:bg-amber-400 active:scale-[0.99] transition"
+        >
+          EXECUTE Roster TRANSFER
+        </button>
+      </form>
+    </div>
+  </div>
+
+      <div id="tab-news" class="admin-tab-content space-y-6 hidden">
+        <div class="admin-card p-6 max-w-2xl mx-auto" id="newsroom-publisher-card">
+          <h3 class="text-md font-bold text-white border-b border-gray-800 pb-2 mb-4" id="newsroom-card-main-title">Draft Newsroom Dispatch</h3>
+          
+          <form onsubmit="executeDataCoreTransaction(event)" class="space-y-4 text-sm" id="form-newsroom-publisher">
+            <div>
+              <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-news-headline">Article Headline Title</label>
+              <input 
+                type="text" 
+                id="nTitle" 
+                placeholder="Headline" 
+                class="form-input" 
+                required 
+              />
+            </div>
+            
+            <div>
+              <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-news-banner">Featured Article Image</label>
+              <input 
+                type="file" 
+                id="nImage" 
+                accept="image/*" 
+                class="form-input text-xs text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer" 
+              />
+            </div>
+            
+            <div>
+              <label class="block text-gray-400 text-xs font-semibold mb-1" id="lbl-news-content">Editorial Content Body</label>
+              <textarea 
+                id="nBody" 
+                rows="6" 
+                placeholder="Write article..." 
+                class="form-input" 
+                required
+              ></textarea>
+            </div>
+            
+            <button 
+              type="submit" 
+              onclick="publishNews(event)"
+              id="btn-submit-newsroom-publisher" 
+              class="w-full mt-2 bg-[#00FF88] text-[#0B0E14] font-bold py-4 rounded-3xl text-sm uppercase tracking-wider hover:bg-emerald-400 transition"
+            >
+              PUBLISH TO ALL USERS
+            </button>
+          </form>
+        </div>
+      </div>
+
+
+
+   <!-- STANDINGS (UPDATED FOR ALL GROUPS) -->
+   <div id="tab-6" class="tab-content hidden">
+    <h2 class="text-3xl font-bold mb-6">Standings Editor — All Groups</h2>
+    <div class="admin-card p-8" id="standingsView">
+      <div class="grid grid-cols-1 gap-8">
+        
+        <div>
+          <h3 class="font-bold mb-4 text-blue-400">GROUP A — FACIT</h3>
+          <textarea id="standingsA" class="form-input" rows="6" placeholder="Pos | Team | P | W | D | L | GF | GA | GD | Pts"></textarea>
+        </div>
+        
+        <div>
+          <h3 class="font-bold mb-4 text-[#00FF88]">GROUP B — LAW</h3>
+          <textarea id="standingsB" class="form-input" rows="6" placeholder="Pos | Team | P | W | D | L | GF | GA | GD | Pts"></textarea>
+        </div>
+        
+        <div>
+          <h3 class="font-bold mb-4 text-orange-400">GROUP C — NASES</h3>
+          <textarea id="standingsC" class="form-input" rows="6" placeholder="Pos | Team | P | W | D | L | GF | GA | GD | Pts"></textarea>
+        </div>
+        
+        <div>
+          <h3 class="font-bold mb-4 text-red-400">GROUP D — MSS</h3>
+          <textarea id="standingsD" class="form-input" rows="6" placeholder="Pos | Team | P | W | D | L | GF | GA | GD | Pts"></textarea>
+        </div>
+        
+        <div>
+          <h3 class="font-bold mb-4 text-purple-400">GROUP E — EDU-ARTS</h3>
+          <textarea id="standingsE" class="form-input" rows="6" placeholder="Pos | Team | P | W | D | L | GF | GA | GD | Pts"></textarea>
+        </div>
+
+        <button onclick="saveStandings()" class="w-full py-5 bg-[#00FF88] text-black font-bold rounded-3xl">UPDATE ALL STANDINGS &amp; BROADCAST</button>
+      </div>
+    </div>
+  </div>
+
+      <!-- DATABASE -->
+      <div id="tab-7" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6">Full Database View</h2>
+        <div class="admin-card p-8 overflow-auto max-h-[70vh]">
+          <pre id="dbJson" class="text-xs text-emerald-300"></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div id="notifPanel" class="hidden fixed bottom-8 right-8 w-96 bg-[#141923] border border-gray-700 rounded-3xl shadow-2xl max-h-[420px] overflow-hidden z-50">
+  <div class="p-5 border-b flex justify-between font-semibold"><span>Live Notifications</span><span onclick="hideNotifPanel()" class="cursor-pointer">✕</span></div>
+  <div id="notifList" class="p-4 max-h-[340px] overflow-y-auto space-y-3"></div>
+</div>
+
+<script>
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCR_L7OutBlVEmEl57Z7xrpC3rKdCnte3M",
+  authDomain: "elite-league-2.firebaseapp.com",
+  databaseURL: "https://elite-league-2-default-rtdb.firebaseio.com",
+  projectId: "elite-league-2",
+  storageBucket: "elite-league-2.firebasestorage.app",
+  messagingSenderId: "327742283927",
+  appId: "1:327742283927:web:ad3247aa41aaad5a6609d2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const dbRef = firebase.database().ref();
+
+// ==================== GLOBAL DATA ====================
+let leagueDB = {
+  players: [],
+  fixtures: [],
+  liveMatch: null,
+  news: [],
+  standings: {A:"", B:"", C:"", D:"", E:""},
+  transfers: [],
+  goals: []
+};
+
+function loadInitialData() {
+  dbRef.once('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) leagueDB = {...leagueDB, ...data};
+    initAllTabs();
+  });
+}
+
+function saveDB() {
+  dbRef.set(leagueDB);
+  addNotification("✅ Changes saved and broadcast to all users", "success");
+}
+
+function globalSaveAll() { saveDB(); }
+
+// ==================== NOTIFICATIONS ====================
+function addNotification(msg, type = "info") {
+  const list = document.getElementById("notifList");
+  const div = document.createElement("div");
+  div.className = `p-4 rounded-2xl text-sm ${type === "success" ? "bg-emerald-900/50 border border-emerald-400" : "bg-gray-800"} notification`;
+  div.innerHTML = msg;
+  list.prepend(div);
+  const badge = document.getElementById("notifBadge");
+  badge.textContent = parseInt(badge.textContent) + 1;
+}
+
+function showNotifPanel() { document.getElementById("notifPanel").classList.remove("hidden"); }
+function hideNotifPanel() { document.getElementById("notifPanel").classList.add("hidden"); }
+
+// ==================== PIN ====================
+function verifyPin(e) {
+  e.preventDefault();
+  if (document.getElementById("adminPin").value === "123789") {
+    document.getElementById("pinModal").classList.add("hidden");
+    document.getElementById("mainAdmin").classList.remove("hidden");
+    loadInitialData();
+  } else {
+    document.getElementById("pinError").classList.remove("hidden");
+  }
+}
+
+// ==================== TAB SWITCH ====================
+function switchTab(n) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`tab-${n}`).classList.remove('hidden');
+}
+
+// ==================== TABS INIT ====================
+function initAllTabs() {
+  renderRoster();
+  renderFixtures();
+  renderLive();
+  renderStandings();
+  renderDatabase();
+  updateOverview();
+}
+
+// Roster
+function renderRoster() {
+  const tbody = document.getElementById("rosterBody");
+  tbody.innerHTML = "";
+  leagueDB.players.forEach((p, i) => {
+    const tr = document.createElement("tr");
+    tr.className = "border-b border-gray-700";
+    tr.innerHTML = `<td class="py-4 px-4">${p.name}</td><td>${p.faculty}</td><td>${p.level}</td><td>${p.position}</td><td><img src="${p.image || ''}" class="w-8 h-8 rounded-full"></td><td><button onclick="deletePlayer(${i})" class="text-red-400">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function addPlayer() {
+  const name = prompt("Player Full Name");
+  if (!name) return;
+  const faculty = prompt("Faculty (e.g. CSC)");
+  const level = prompt("Level (e.g. 400)");
+  const position = prompt("Position");
+  const image = prompt("Image URL (optional)");
+  leagueDB.players.push({name, faculty, level, position, image});
+  renderRoster();
+  saveDB();
+}
+
+function deletePlayer(i) {
+  if (confirm("Delete?")) {
+    leagueDB.players.splice(i, 1);
+    renderRoster();
+    saveDB();
+  }
+}
+
+// Fixtures
+function createFixture(e) {
+  e.preventDefault();
+  const home = document.getElementById("fHome").value;
+  const away = document.getElementById("fAway").value;
+  leagueDB.fixtures.push({home, away, date: document.getElementById("fDate").value, time: document.getElementById("fTime").value});
+  renderFixtures();
+  saveDB();
+}
+
+function renderFixtures() {
+  const container = document.getElementById("fixtureList");
+  container.innerHTML = leagueDB.fixtures.map(f => `
+    <div class="admin-card p-6 flex justify-between items-center">
+      <div>${f.home} vs ${f.away}</div>
+      <div>${f.date} ${f.time}</div>
+    </div>
+  `).join('');
+}
+
+// Live Engine
+function startLiveMatch() {
+  leagueDB.liveMatch = {home: "CSC 400", away: "LAW 400", homeScore: 0, awayScore: 0, minute: 0, events: []};
+  dbRef.child('liveMatch').set(leagueDB.liveMatch);
+  document.getElementById("liveBoard").classList.remove("hidden");
+}
+
+function stopLiveMatch() {
+  if (confirm("End match?")) {
+    leagueDB.liveMatch = null;
+    dbRef.child('liveMatch').remove();
+    document.getElementById("liveBoard").classList.add("hidden");
+    addNotification("🏁 Match ended", "success");
+  }
+}
+
+function halfTime() {
+  addNotification("⏸️ Half Time", "success");
+}
+
+function liveGoal(side) {
+  if (!leagueDB.liveMatch) return;
+  if (side === "home") leagueDB.liveMatch.homeScore++;
+  else leagueDB.liveMatch.awayScore++;
+  dbRef.child('liveMatch').set(leagueDB.liveMatch);
+  document.getElementById("liveHomeScore").textContent = leagueDB.liveMatch.homeScore;
+  document.getElementById("liveAwayScore").textContent = leagueDB.liveMatch.awayScore;
+  addNotification(`⚽ GOAL! ${side.toUpperCase()}`, "success");
+}
+
+function recordGoal(side) {
+  const scorer = document.getElementById(side + "Scorer").value || "Unknown";
+  const minute = document.getElementById(side + "Minute").value || "45";
+  if (!leagueDB.liveMatch) return;
+  leagueDB.liveMatch.events.push({side, scorer, minute, type: "goal"});
+  dbRef.child('liveMatch').set(leagueDB.liveMatch);
+  addNotification(`⚽ ${scorer} ${minute}'`, "success");
+}
+
+function addCard(color, side) {
+  addNotification(`${color.toUpperCase()} CARD - ${side.toUpperCase()}`, "success");
+}
+
+function addCommentary() {
+  const comment = document.getElementById("liveComment").value;
+  if (comment) {
+    addNotification(`📢 ${comment}`, "success");
+    document.getElementById("liveComment").value = "";
+  }
+}
+
+// News
+function publishNews() {
+  const title = document.getElementById("nTitle").value || "News";
+  leagueDB.news.push({title, body: document.getElementById("nBody").value, time: new Date().toLocaleString()});
+  addNotification("📰 News published", "success");
+  saveDB();
+}
+
+// Standings
+function saveStandings() {
+  leagueDB.standings.A = document.getElementById("standingsA").value;
+  leagueDB.standings.B = document.getElementById("standingsB").value;
+  addNotification("📋 Standings updated", "success");
+  saveDB();
+}
+
+function renderStandings() {
+  document.getElementById("standingsA").value = leagueDB.standings.A || "";
+  document.getElementById("standingsB").value = leagueDB.standings.B || "";
+}
+
+// Database
+function renderDatabase() {
+  document.getElementById("dbJson").textContent = JSON.stringify(leagueDB, null, 2);
+}
+
+function updateOverview() {
+  document.getElementById("ov-players").textContent = leagueDB.players.length;
+  document.getElementById("ov-fixtures").textContent = leagueDB.fixtures.length;
+}
+
+// Transfer
+function executeTransfer() {
+  const player = document.getElementById("tPlayer").value;
+  if (player) {
+    leagueDB.transfers.push({player, from: document.getElementById("tFrom").value, to: document.getElementById("tTo").value});
+    addNotification("🔄 Transfer executed", "success");
+    saveDB();
+  }
+}
+
+// Start
+window.onload = () => {};
+</script>
+</body>
+</html>

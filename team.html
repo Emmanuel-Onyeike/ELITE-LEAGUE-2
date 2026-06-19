@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Teams — Elite League</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:8px;border:2px solid var(--neon);box-shadow:0 0 12px rgba(0,255,136,0.4);background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚽</div>
+      <div class="sidebar-logo-text">ELITE LEAGUE<span>UNIVERSITY FC</span></div>
+    </div>
+    <nav>
+      <div class="nav-section">
+        <div class="nav-label">Main</div>
+        <a href="index.html" class="nav-item active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Home
+        </a>
+        <a href="dashboard.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Dashboard
+        </a>
+        <a href="live.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9l5 3-5 3V9z"/></svg>
+          Live <span class="nav-badge live">LIVE</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Competition</div>
+        <a href="fixtures.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Fixtures
+        </a>
+        <a href="games.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Games
+        </a>
+        <a href="standings.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Standings
+        </a>
+        <a href="transfer.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          Transfers
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Players & Teams</div>
+        <a href="team.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Teams
+        </a>
+        <a href="goals.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Goals
+        </a>
+        <a href="assists.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Assists
+        </a>
+        <a href="database.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 4 3h8c2.5 0 4-1 4-3V7c0-2-1.5-3-4-3H8C5.5 4 4 5 4 7zm0 5h16"/></svg>
+          Database
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Media</div>
+        <a href="news.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          News
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+          Admin
+        </a>
+      </div>
+    </nav>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <span class="topbar-title">TEAMS</span>
+    </div>
+    <div class="topbar-right"><span style="font-size:12px;color:var(--muted);" id="live-clock"></span></div>
+  </header>
+  <main class="page-content">
+
+    <div class="stat-grid" style="margin-bottom:24px;">
+      <div class="stat-card"><div class="icon blue">🏟️</div><div class="stat-value" id="stat-groups">5</div><div class="stat-label">Faculty Groups</div></div>
+      <div class="stat-card"><div class="icon neon">👥</div><div class="stat-value" id="stat-teams">21</div><div class="stat-label">Teams Registered</div></div>
+      <div class="stat-card"><div class="icon gold">📋</div><div class="stat-value" id="stat-players">0</div><div class="stat-label">Registered Players</div></div>
+      <div class="stat-card"><div class="icon red">🏆</div><div class="stat-value">CSC 400</div><div class="stat-label">Defending Champs</div></div>
+    </div>
+
+<div id="teams-directory-page-wrapper">
+
+    <!-- NAVIGATION TABS -->
+    <div class="tabs" id="directory-filter-tabs" style="margin-bottom:20px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="tab active" data-tab="teams-all">All Teams</button>
+      <button class="tab" data-tab="teams-facit">FACIT</button>
+      <button class="tab" data-tab="teams-law">LAW</button>
+      <button class="tab" data-tab="teams-nases">NASES</button>
+      <button class="tab" data-tab="teams-mss">MSS</button>
+      <button class="tab" data-tab="teams-edu">EDU-ARTS</button>
+    </div>
+  
+    <!-- PANEL: ALL TEAMS DIRECTORY -->
+    <div data-panel="teams-all" id="panel-directory-all">
+      
+      <!-- CHAMPION TEAM HIGHLIGHT -->
+      <div class="champion-banner" id="champion-highlight-banner" style="margin-bottom:24px; background:linear-gradient(135deg, rgba(255,215,0,0.05), rgba(4,13,32,0.9)); border:1px solid rgba(255,215,0,0.2); border-radius:16px; padding:24px;">
+        <div class="champion-content" style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+          <div class="champion-photo" style="font-size:40px; background:rgba(255,215,0,0.1); width:70px; height:70px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:2px dashed var(--gold);">🏆</div>
+          <div class="champion-info">
+            <div style="font-size:10px; color:var(--gold); letter-spacing:2px; font-weight:700; margin-bottom:4px;">DEFENDING CHAMPIONS · AUTO-QUALIFIED</div>
+            <h2 style="font-family:'Orbitron', sans-serif; font-size:28px; font-weight:800; color:var(--white); margin:0 0 4px 0;">CSC 400</h2>
+            <p style="color:var(--muted); font-size:13px; margin:0 0 12px 0;">Computing Science — Level 400 · Group A (FACIT)</p>
+            <div class="champion-trophies" style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="badge badge-gold" style="padding:4px 10px; font-size:11px;">🏆 Elite Champions 2025</span>
+              <span class="badge" style="background:rgba(255,255,255,0.05); color:var(--white); padding:4px 10px; font-size:11px;">🥇 VC Cup 2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- MASTER ALL TEAMS GRID -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:16px;" id="directory-master-grid">
+        <!-- Populated by Firebase -->
+      </div>
+    </div>
+  
+    <!-- GROUP SPECIFIC PANELS -->
+    <div data-panel="teams-facit" id="panel-directory-facit" style="display:none;">
+      <div class="card">
+        <div style="font-size:11px; color:var(--blue); font-weight:700; letter-spacing:1px; margin-bottom:16px;">GROUP A — FACIT</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:12px;" id="facit-grid"></div>
+      </div>
+    </div>
+  
+    <div data-panel="teams-law" id="panel-directory-law" style="display:none;">
+      <div class="card">
+        <div style="font-size:11px; color:var(--neon); font-weight:700; letter-spacing:1px; margin-bottom:16px;">GROUP B — LAW</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:12px;" id="law-grid"></div>
+      </div>
+    </div>
+  
+    <div data-panel="teams-nases" id="panel-directory-nases" style="display:none;">
+      <div class="card">
+        <div style="font-size:11px; color:#FF6600; font-weight:700; letter-spacing:1px; margin-bottom:16px;">GROUP C — NASES</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:12px;" id="nases-grid"></div>
+      </div>
+    </div>
+  
+    <div data-panel="teams-mss" id="panel-directory-mss" style="display:none;">
+      <div class="card">
+        <div style="font-size:11px; color:var(--red); font-weight:700; letter-spacing:1px; margin-bottom:16px;">GROUP D — MSS</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:12px;" id="mss-grid"></div>
+      </div>
+    </div>
+  
+    <div data-panel="teams-edu" id="panel-directory-edu" style="display:none;">
+      <div class="card">
+        <div style="font-size:11px; color:#A050FF; font-weight:700; letter-spacing:1px; margin-bottom:16px;">GROUP E — EDU-ARTS</div>
+        <div style="background:rgba(160,80,255,0.05); border:1px solid rgba(160,80,255,0.15); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:rgba(160,80,255,0.8);">ℹ️ Players not selected in any faculty's squad are eligible for EDU-ARTS.</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:12px;" id="edu-grid"></div>
+      </div>
+    </div>
+  
+  </div>
+  </main>
+</div>
+
+<script>
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCR_L7OutBlVEmEl57Z7xrpC3rKdCnte3M",
+  authDomain: "elite-league-2.firebaseapp.com",
+  databaseURL: "https://elite-league-2-default-rtdb.firebaseio.com",
+  projectId: "elite-league-2",
+  storageBucket: "elite-league-2.firebasestorage.app",
+  messagingSenderId: "327742283927",
+  appId: "1:327742283927:web:ad3247aa41aaad5a6609d2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const teamsRef = firebase.database().ref('teams');
+
+// Real-time Listener
+teamsRef.on('value', (snapshot) => {
+  const data = snapshot.val() || {};
+  renderAllTeams(data);
+});
+
+function renderAllTeams(teams) {
+  const container = document.getElementById('directory-master-grid');
+  container.innerHTML = '';
+
+  const teamsArray = Object.values(teams);
+
+  // Update stats
+  document.getElementById('stat-teams').textContent = teamsArray.length;
+
+  if (teamsArray.length === 0) {
+    container.innerHTML = `<div class="card" style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">No teams registered yet</div>`;
+    return;
+  }
+
+  teamsArray.forEach(team => {
+    const card = document.createElement('div');
+    card.className = "card";
+    card.style.cssText = "text-align:center; padding:24px 20px;";
+    card.innerHTML = `
+      <div style="width:60px;height:60px;border-radius:50%;background:rgba(0,102,255,0.05);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;">${team.icon || '🏫'}</div>
+      <div style="font-weight:700;color:var(--white);font-size:16px;">${team.name}</div>
+      <div style="font-size:11px;color:var(--muted);margin:4px 0 12px;">${team.faculty || ''} · ${team.level || ''}L</div>
+      <span class="badge badge-blue">${team.group || 'N/A'}</span>
+      <div style="margin-top:16px;font-size:11px;color:var(--muted);">Coach: ${team.coach || 'TBD'}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Tab Switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('[data-panel]').forEach(p => p.style.display = 'none');
+    document.getElementById(`panel-directory-${tab.getAttribute('data-tab').split('-')[1] || 'all'}`).style.display = 'block';
+  });
+});
+
+// Notification Permission
+if ("Notification" in window) {
+  Notification.requestPermission();
+}
+
+window.onload = () => {
+  console.log("%c✅ Teams page connected to Firebase Realtime Database", "color:#00FF88");
+};
+</script>
+</body>
+</html>
